@@ -1,11 +1,16 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     runtimeConfig: {
+       /* public: {
+            apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://api.nyeremenyjatek.donestudio.hu/api',
+            apiVersion: process.env.NUXT_PUBLIC_API_VERSION || '/v1',
+            adminUrl: process.env.NUXT_PUBLIC_ADMIN_URL || 'https://api.nyeremenyjatek.donestudio.hu/api/v1/admin/'
+        }*/
         public: {
-            apiBase: 'https://api.nyeremenyjatek.donestudio.hu/api',
-            apiVersion: '/v1',
-            adminUrl: 'https://api.nyeremenyjatek.donestudio.hu/api/v1/admin/',
-        },
+            apiBase: process.env.NUXT_PUBLIC_API_BASE,
+            apiVersion: process.env.NUXT_PUBLIC_API_VERSION,
+            adminUrl: process.env.NUXT_PUBLIC_ADMIN_URL
+        }
     },
 
     components: [
@@ -76,7 +81,8 @@ export default defineNuxtConfig({
 */
     sanctum: {
         mode: 'token',
-        baseUrl: 'https://api.nyeremenyjatek.donestudio.hu/api', // Laravel API
+        //baseUrl: 'https://api.nyeremenyjatek.donestudio.hu/api', // Laravel API
+        baseUrl: process.env.NUXT_PUBLIC_API_BASE, // Laravel API
         redirect: {
             onLogin: '/',
             onLogout: '/login',
