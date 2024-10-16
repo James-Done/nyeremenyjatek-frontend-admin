@@ -76,7 +76,7 @@ export default defineNuxtConfig({
 */
     sanctum: {
         mode: 'token',
-        baseUrl: 'https://api.nyeremenyjatek.donestudio.hu/api/v1', // Laravel API
+        baseUrl: 'https://api.nyeremenyjatek.donestudio.hu/api', // Laravel API
         redirect: {
             onLogin: '/',
             onLogout: '/login',
