@@ -2,9 +2,11 @@
 export default defineNuxtConfig({
     runtimeConfig: {
         public: {
-            apiBase: process.env.NUXT_PUBLIC_API_BASE,
-            apiVersion: process.env.NUXT_PUBLIC_API_VERSION,
-            adminUrl: `${process.env.NUXT_PUBLIC_API_BASE}${process.env.NUXT_PUBLIC_API_VERSION}/admin/`,
+            apiBase: process.env.NUXT_PUBLIC_API_BASE || 'default_api_base',
+            apiVersion: process.env.NUXT_PUBLIC_API_VERSION || 'default_api_version',
+            adminUrl: process.env.NUXT_PUBLIC_API_BASE && process.env.NUXT_PUBLIC_API_VERSION ?
+                `${process.env.NUXT_PUBLIC_API_BASE}${process.env.NUXT_PUBLIC_API_VERSION}/admin/` :
+                'default_admin_url',
         },
     },
 
