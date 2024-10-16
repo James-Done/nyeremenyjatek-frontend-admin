@@ -4,7 +4,7 @@ export default defineNuxtConfig({
         public: {
             apiBase: 'https://api.nyeremenyjatek.donestudio.hu/api',
             apiVersion: '/v1',
-            adminUrl: 'https://api.nyeremenyjatek.donestudio.hu/api/v1',
+            adminUrl: 'https://api.nyeremenyjatek.donestudio.hu/api/v1/',
         },
     },
 
