@@ -3,8 +3,8 @@ export default defineNuxtConfig({
     runtimeConfig: {
         public: {
             apiBase: 'https://api.nyeremenyjatek.donestudio.hu/api',
-            apiVersion: 'v/1',
-            adminUrl: 'https.//admin.nyeremenyjatek.donestudio.hu/',
+            apiVersion: '/v1',
+            adminUrl: 'https://admin.nyeremenyjatek.donestudio.hu/',
         },
     },
 
@@ -76,7 +76,7 @@ export default defineNuxtConfig({
 */
     sanctum: {
         mode: 'token',
-        baseUrl: `${process.env.NUXT_PUBLIC_API_BASE}`, // Laravel API
+        baseUrl: 'https://api.nyeremenyjatek.donestudio.hu/api/v1', // Laravel API
         redirect: {
             onLogin: '/',
             onLogout: '/login',
