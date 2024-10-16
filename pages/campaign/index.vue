@@ -11,33 +11,35 @@
                 </div>
 
                 <div class="col-12">
-                    <TableComponent :columns="columns" :rows="campaigns">
+                    <TableComponent :columns="columns" :rows="data">
                         <template #name="{ row }">
-                            {{ row.name }}
+                            {{ row.campaign_name }}
                         </template>
                         <template #description="{ row }">
-                            {{ row.description }}
+                            {{ row.campaign_description }}
                         </template>
                         <template #start="{ row }">
-                            {{ row.start }}
+                            {{ row.campaign_start }}
                         </template>
                         <template #end="{ row }">
-                            {{ row.end }}
+                            {{ row.campaign_end }}
                         </template>
                         <template #createdBy="{ row }">
-                            {{ row.createdBy }}
+                            {{ row.created_by }}
                         </template>
                         <template #createdAt="{ row }">
-                            {{ row.createdAt }}
+                            {{ row.created_at }}
                         </template>
                         <template #type="{ row }">
-                            {{ row.type }}
+                            {{ row.drawing }}
                         </template>
-                        <template #delete="{ row }">
-                            <button class="btn btn-danger" @click="deleteCampaign(row.id)">{{ $t('delete') }}</button>
+                        <template v-if="features.campaigns.delete" #delete="{ row }">
+                            <button class="btn btn-danger" @click="deleteCampaign(row.campaign_id)">
+                                {{ $t('delete') }}
+                            </button>
                         </template>
-                        <template #edit="{ row }">
-                            <NuxtLink :to="`/campaign/edit/${row.id}`" class="btn btn-primary">{{
+                        <template v-if="features.campaigns.edit" #edit="{ row }">
+                            <NuxtLink :to="`/campaign/edit/${row.campaign_id}`" class="btn btn-primary">{{
                                 $t('edit')
                             }}</NuxtLink>
                         </template>
@@ -50,6 +52,10 @@
 
 <script setup>
     const { t } = useI18n();
+    const runtimeConfig = useRuntimeConfig();
+    const client = useSanctumClient();
+    const features = useFeatureStore();
+
     const columns = [
         { key: 'name', label: t('name') },
         { key: 'description', label: t('description') },
@@ -62,42 +68,27 @@
         { key: 'delete', label: t('delete') },
     ];
 
-    const campaigns = [
-        {
-            id: 1,
-            name: 'Első kampány',
-            description: 'Ez az első kampány',
-            start: '2021-10-01',
-            end: '2021-10-31',
-            createdBy: 'Admin',
-            createdAt: '2021-09-01',
-            type: 'Sorsolás',
-        },
-        {
-            id: 2,
-            name: 'Második kampány',
-            description: 'Ez a második kampány',
-            start: '2021-11-01',
-            end: '2021-11-30',
-            createdBy: 'Admin',
-            createdAt: '2021-09-01',
-            type: 'Sorsolás',
-        },
-        {
-            id: 3,
-            name: 'Harmadik kampány',
-            description: 'Ez a harmadik kampány',
-            start: '2021-12-01',
-            end: '2021-12-31',
-            createdBy: 'Admin',
-            createdAt: '2021-09-01',
-            type: 'Sorsolás',
-        },
-    ];
+    if (!features.campaigns.delete) {
+        columns.splice(
+            columns.findIndex((column) => column.key === 'delete'),
+            1,
+        );
+    }
 
-    // TODO: fetch campaigns from the API
+    if (!features.campaigns.edit) {
+        columns.splice(
+            columns.findIndex((column) => column.key === 'edit'),
+            1,
+        );
+    }
+
+    const { data } = useAsyncData(async () => {
+        const response = await client(`${runtimeConfig.public.adminUrl}campaigns`);
+        return response;
+    });
+
     // TODO: delete campaign
     const deleteCampaign = (id) => {
-        campaigns.value = campaigns.value.filter((campaign) => campaign.id !== id);
+        console.log('delete campaign', id);
     };
 </script>

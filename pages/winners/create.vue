@@ -1,6 +1,6 @@
 <template>
     <div>
-        <WinnersForm />
+        <WinnersFormVerbena />
     </div>
 </template>
 

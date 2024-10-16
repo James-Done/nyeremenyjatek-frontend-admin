@@ -39,6 +39,8 @@
 <script setup>
     const config = useRuntimeConfig();
     const { t } = useI18n();
+    const client = useSanctumClient();
+    const runtimeConfig = useRuntimeConfig();
 
     let deleteDisabled = ref(false);
     const columns = [
@@ -48,15 +50,12 @@
         { key: 'delete', label: t('delete') },
     ];
 
-    const { data: users, refresh: refreshUsers } = await useFetch(`${config.public.apiBase}users`, {
-        query: {
-            select: 'id,username,email',
-        },
-        transform: (data) => {
-            return data.users;
-        },
-    }).catch((err) => {
-        throw new Error(err);
+    const { data: users, refresh: refreshUsers } = useAsyncData(async () => {
+        const response = await client(`${runtimeConfig.public.adminUrl}users`);
+
+        console.log(response);
+
+        return response;
     });
 
     const deleteUser = async (id) => {

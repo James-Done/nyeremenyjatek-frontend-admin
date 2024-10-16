@@ -4,12 +4,14 @@
             <div class="col-12">
                 <h1>{{ $t('entries') }}</h1>
                 <div class="pt-3 pb-3">
-                    <button class="btn btn-primary" @click.prevent="handleExport">{{ $t('exportEntries') }}</button>
+                    <button v-if="features.entries.export" class="btn btn-primary" @click.prevent="handleExport">
+                        {{ $t('exportEntries') }}
+                    </button>
                 </div>
             </div>
         </div>
 
-        <form @submit="onSubmit">
+        <form v-if="features.entries.filter" @submit="onSubmit">
             <div class="row mb-2">
                 <div class="col-md-3">
                     <SearchInput v-bind="searchInputs.firstName" />
@@ -51,13 +53,23 @@
         <div class="row mb-2">
             <div class="col-12">
                 <div v-if="filtersActive" class="d-flex justify-content-end">
-                    <button class="btn btn-danger" @click="resetFilters">{{ $t('resetFilters') }}</button>
+                    <button class="btn btn-danger" @click="resetForm">{{ $t('resetFilters') }}</button>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-12">
-                <TableComponent :columns="columns" :rows="entries">
+                <TableComponent
+                    :columns="columns"
+                    :rows="data?.data"
+                    :last-page="data?.last_page"
+                    @refresh="
+                        (page) => {
+                            currentPage = page;
+                            refresh();
+                        }
+                    "
+                >
                     <template #lastname="{ row }">
                         {{ row.lastname }}
                     </template>
@@ -109,6 +121,11 @@
 
 <script setup>
     const { t } = useI18n();
+    const features = useFeatureStore();
+    const runtimeConfig = useRuntimeConfig();
+    const client = useSanctumClient();
+
+    const currentPage = ref(1);
 
     let searchInputs = ref({
         firstName: {
@@ -181,41 +198,41 @@
         { key: 'purchaseAmount', label: t('purchaseAmount') },
     ];
 
-    // TODO: fetch entries from API
-    const entries = ref([
-        {
-            id: 1,
-            lastname: 'Doe',
-            firstname: 'John',
-            email: 'jshon@doe.com',
-            phone: '1234567890',
-            birthDate: '01/01/2000',
-            newsletter: 'Yes',
-            campaign: 'Campaign 1',
-            city: 'City 1',
-            apcode: 'APCODE 1',
-            purchaseDate: '01/01/2021',
-            purchaseAmount: '100',
-        },
-        {
-            id: 2,
-            lastname: 'Doe',
-            firstname: 'Jane',
-            email: 'jane@doe.com',
-            phone: '1234567890',
-            birthDate: '01/01/2000',
-            newsletter: 'Yes',
-            campaign: 'Campaign 2',
-            city: 'City 2',
-            apcode: 'APCODE 2',
-            purchaseDate: '01/01/2021',
-            purchaseAmount: '100',
-        },
-    ]);
+    const { data, refresh } = useAsyncData(async () => {
+        const response = await client(`${runtimeConfig.public.adminUrl}entries?page=${currentPage.value}`);
 
-    const handleExport = () => {
-        // TODO:implement export functionality
-        console.log('Exporting entries');
+        const entries = response.data.map((entry) => {
+            return {
+                lastname: entry.last_name,
+                firstname: entry.first_name,
+                email: entry.email,
+                phone: entry.phone,
+                birthDate: entry.birthday,
+                newsletter: entry.newsletter,
+                campaign: entry.campaign_id,
+                city: entry.city_id,
+                apcode: entry.AP_code,
+                purchaseDate: entry.date_of_purchase,
+                purchaseAmount: entry.amount_of_purchase,
+            };
+        });
+
+        response.data = entries;
+        return response;
+    });
+
+    const handleExport = async () => {
+        try {
+            const response = await client(`${runtimeConfig.public.adminUrl}export/entries_view`);
+            const anchor = document.createElement('a');
+            anchor.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(response);
+            anchor.target = '_blank';
+            anchor.download = `entries-${new Date().toISOString()}.csv`;
+            anchor.click();
+        } catch (error) {
+            console.error(error);
+            useEvent('showToast', { title: t('error'), message: t('exportError') });
+        }
     };
 
     const schema = object({
@@ -228,7 +245,7 @@
         city: string().optional(),
     });
 
-    const { handleSubmit, isSubmitting, values } = useForm({
+    const { handleSubmit, isSubmitting, values, resetForm } = useForm({
         validationSchema: toTypedSchema(schema),
     });
 
@@ -238,14 +255,9 @@
         }
 
         console.log(values);
-        // TODO: fetch entries from API refresh entries
     });
 
     const filtersActive = computed(() => {
         return Object.values(values).some((value) => typeof value !== 'undefined');
     });
-
-    const resetFilters = () => {
-        //
-    };
 </script>

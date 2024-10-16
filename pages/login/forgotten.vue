@@ -27,24 +27,37 @@
 <script setup>
     definePageMeta({
         layout: 'unauthenticated',
+        sanctum: {
+            excluded: true,
+        },
     });
+
+    const { t } = useI18n();
 
     const schema = object({
         email: string().email().min(1),
     });
 
-    const { handleSubmit, isSubmitting, resetForm } = useForm({
+    const { handleSubmit, isSubmitting, resetForm, setErrors } = useForm({
         validationSchema: toTypedSchema(schema),
     });
 
     const onSubmit = handleSubmit(async (values) => {
-        // TODO: aPI call to send password reset link
-        console.log(values);
-        resetForm();
+        try {
+            await $fetch('/web/v1/public/password/remind', {
+                method: 'POST',
+                body: { data: JSON.stringify(values) },
+            });
 
-        useEvent('showToast', {
-            title: 'Success',
-            message: 'Password reset link sent to your email',
-        });
+            useEvent('showToast', {
+                title: 'Success',
+                message: 'Password reset link sent to your email',
+            });
+
+            resetForm();
+        } catch (error) {
+            console.error(error);
+            setErrors({ email: t('loginError') });
+        }
     });
 </script>

@@ -5,6 +5,10 @@
 </template>
 
 <script setup>
+    definePageMeta({
+        middleware: 'user-role',
+    });
+
     const { t } = useI18n();
     const route = useRoute();
     const id = route.params.id;

@@ -9,15 +9,13 @@
                             <button class="btn btn-primary" @click.prevent="handleExport">
                                 {{ $t('exportWinners') }}
                             </button>
-                            <NuxtLink to="winners/create" class="btn btn-primary" @click.prevent="handleExport">{{
-                                $t('drawWinner')
-                            }}</NuxtLink>
+                            <NuxtLink to="winners/create" class="btn btn-primary">{{ $t('drawWinner') }}</NuxtLink>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <form @submit="onSubmit">
+            <form v-if="features.winners.filter" @submit="onSubmit">
                 <div class="row mb-2">
                     <div class="col-md-3">
                         <SearchInput v-bind="searchInputs.firstName" />
@@ -62,81 +60,45 @@
             </div>
         </div>
 
-        <div class="container-fluid">
+        <div class="container">
             <div class="row">
                 <div class="col-12">
-                    <TableComponent :columns="columns" :rows="winners">
+                    <TableComponent :columns="columns" :rows="data">
                         <template #lastname="{ row }">
-                            {{ row.lastname }}
+                            {{ row.entry.last_name }}
                         </template>
 
                         <template #firstname="{ row }">
-                            {{ row.firstname }}
+                            {{ row.entry.first_name }}
                         </template>
 
                         <template #email="{ row }">
-                            {{ row.email }}
+                            {{ row.entry.email }}
                         </template>
 
                         <template #phone="{ row }">
-                            {{ row.phone }}
+                            {{ row.entry.phone }}
                         </template>
 
-                        <template #birthDate="{ row }">
-                            {{ row.birthDate }}
+                        <template #prizeType="{ row }">
+                            {{ row.prize_type }}
+                        </template>
+
+                        <template #prizeName="{ row }">
+                            {{ row.prize.prize_name }}
+                        </template>
+
+                        <template #winningDay="{ row }">
+                            {{ row.winning_day }}
                         </template>
 
                         <template #location="{ row }">
                             {{ row.location }}
                         </template>
 
-                        <template #apcode="{ row }">
-                            {{ row.apcode }}
-                        </template>
-
-                        <template #purchaseDate="{ row }">
-                            {{ row.purchaseDate }}
-                        </template>
-
-                        <template #purchaseAmount="{ row }">
-                            {{ row.purchaseAmount }}
-                        </template>
-
-                        <template #privacyPolicy="{ row }">
-                            {{ row.privacyPolicy }}
-                        </template>
-
-                        <template #newsletter="{ row }">
-                            {{ row.newsletter }}
-                        </template>
-
-                        <template #prizeType="{ row }">
-                            {{ row.prizeType }}
-                        </template>
-
-                        <template #prize="{ row }">
-                            {{ row.prize }}
-                        </template>
-
-                        <template #drawType="{ row }">
-                            {{ row.drawType }}
-                        </template>
-
-                        <template #status="{ row }">
-                            {{ row.status }}
-                        </template>
-
-                        <template #drawTime="{ row }">
-                            {{ row.drawTime }}
-                        </template>
-
-                        <template #drawnBy="{ row }">
-                            {{ row.drawnBy }}
-                        </template>
-
                         <template #notificationSuccess="{ row }">
                             <NuxtLink
-                                :to="`winners/edit/${row.id}`"
+                                :to="`winners/edit/${row.entry_id}`"
                                 class="btn"
                                 :class="{
                                     'btn-success': row.notificationSuccess === '1',
@@ -156,6 +118,9 @@
 
 <script setup>
     const { t } = useI18n();
+    const features = useFeatureStore();
+    const runtimeConfig = useRuntimeConfig();
+    const client = useSanctumClient();
 
     let searchInputs = ref({
         firstName: {
@@ -214,71 +179,33 @@
         { key: 'firstname', label: t('firstName') },
         { key: 'email', label: t('email') },
         { key: 'phone', label: t('phone') },
-        { key: 'birthDate', label: t('birthDate') },
-        { key: 'location', label: t('location') },
-        { key: 'apcode', label: t('apcode') },
-        { key: 'purchaseDate', label: t('purchaseDate') },
-        { key: 'purchaseAmount', label: t('purchaseAmount') },
-        { key: 'privacyPolicy', label: t('privacyPolicy') },
-        { key: 'newsletter', label: t('newsletter') },
         { key: 'prizeType', label: t('prizetype') },
-        { key: 'prize', label: t('prize') },
-        { key: 'drawType', label: t('drawType') },
-        { key: 'status', label: t('status') },
-        { key: 'drawTime', label: t('drawTime') },
-        { key: 'drawnBy', label: t('drawnBy') },
-        { key: 'notificationSuccess', label: t('success') },
+        { key: 'prizeName', label: t('prize') },
+        { key: 'winningDay', label: t('winningDay') },
     ];
 
-    // TODO: fetch winners from API
-    const winners = ref([
-        {
-            id: 1,
-            lastname: 'Doe',
-            firstname: 'John',
-            email: 'jshon@doe.com',
-            phone: '1234567890',
-            birthDate: '01/01/2000',
-            location: 'New York',
-            apcode: '123456',
-            purchaseDate: '01/01/2021',
-            purchaseAmount: '100',
-            privacyPolicy: '1',
-            newsletter: '1',
-            prizeType: '1',
-            prize: '1',
-            drawType: '1',
-            status: '1',
-            drawTime: '01/01/2021',
-            drawnBy: 'John Doe',
-            notificationSuccess: '1',
-        },
-        {
-            id: 2,
-            lastname: 'Doe',
-            firstname: 'Jane',
-            email: 'asdas@asd.asd',
-            phone: '1234567890',
-            birthDate: '01/01/2000',
-            location: 'New York',
-            apcode: '123456',
-            purchaseDate: '01/01/2021',
-            purchaseAmount: '100',
-            privacyPolicy: '1',
-            newsletter: '1',
-            prizeType: '1',
-            prize: '1',
-            drawType: '1',
-            status: '1',
-            drawTime: '01/01/2021',
-            drawnBy: 'John Doe',
-            notificationSuccess: '0',
-        },
-    ]);
+    const { data } = useAsyncData(async () => {
+        try {
+            const response = await client(`${runtimeConfig.public.adminUrl}winners`);
+            return response;
+        } catch (error) {
+            console.error(error);
+            useEvent('showToast', { title: t('error'), message: t('fetchError') });
+        }
+    });
 
-    const handleExport = () => {
-        // TODO:implement export functionality
-        console.log('Exporting winners');
+    const handleExport = async () => {
+        try {
+            const response = await client(`${runtimeConfig.public.adminUrl}export/winners_view`);
+            const anchor = document.createElement('a');
+            anchor.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(response);
+            anchor.target = '_blank';
+            anchor.download = `winners-${new Date().toISOString()}.csv`;
+            anchor.click();
+        } catch (error) {
+            console.error(error);
+            useEvent('showToast', { title: t('error'), message: t('exportError') });
+        }
     };
 
     const schema = object({

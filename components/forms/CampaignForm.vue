@@ -18,14 +18,14 @@
                             :value="campaignName"
                             :label="$t('campaignName')"
                             :required="true"
-                            name="campaignName"
+                            name="campaign_name"
                         />
                     </div>
                     <div class="mb-3">
                         <TextArea
                             id="campaign-description"
                             :value="campaignDescription"
-                            name="campaignDescription"
+                            name="campaign_description"
                             :label="$t('campaignDescription')"
                             :required="true"
                         />
@@ -35,7 +35,27 @@
                         <DatePicker
                             id="campaign-start"
                             :value="campaignStart"
-                            name="campaignStart"
+                            name="entry_start"
+                            :label="$t('entryStartDate')"
+                            :required="true"
+                        />
+                    </div>
+
+                    <div class="mb-3">
+                        <DatePicker
+                            id="campaign-start"
+                            :value="campaignStart"
+                            name="entry_end"
+                            :label="$t('entryEndDate')"
+                            :required="true"
+                        />
+                    </div>
+
+                    <div class="mb-3">
+                        <DatePicker
+                            id="campaign-start"
+                            :value="campaignStart"
+                            name="campaign_start"
                             :label="$t('campaignStartDate')"
                             :required="true"
                         />
@@ -45,7 +65,7 @@
                         <DatePicker
                             id="campaign-end"
                             :value="campaignEnd"
-                            name="campaignEnd"
+                            name="campaign_end"
                             :label="$t('campaignEndDate')"
                             :required="true"
                         />
@@ -54,211 +74,215 @@
                     <div class="mb-3">
                         <Select
                             id="draw-type"
-                            name="drawType"
+                            name="drawing"
                             :label="$t('campaignDrawType')"
                             :value="drawType"
                             :options="[
                                 { value: 'auto', label: $t('auto') },
-                                { value: 'human', label: $t('human') },
+                                { value: 'manual', label: $t('manual') },
                                 { value: 'external', label: $t('external') },
                             ]"
                         />
                     </div>
 
-                    <div class="mb-3">
-                        <Checkbox
-                            id="daily-prizes-active"
-                            name="showDailySettings"
-                            :label="$t('dailyPrizes')"
-                            value="on"
-                            :model-value="dailyPrizesActive"
-                            :checked="showDailySettings"
-                            @change="
-                                (event) => {
-                                    dailyPrizesActive = event.target.checked;
-                                }
-                            "
-                        />
+                    <div v-if="features.campaigns.prizes">
+                        <div class="mb-3">
+                            <Checkbox
+                                id="daily-prizes-active"
+                                name="showDailySettings"
+                                :label="$t('dailyPrizes')"
+                                value="on"
+                                :model-value="dailyPrizesActive"
+                                :checked="showDailySettings"
+                                @change="
+                                    (event) => {
+                                        dailyPrizesActive = event.target.checked;
+                                    }
+                                "
+                            />
 
-                        <Checkbox
-                            id="weekly-prizes-active"
-                            name="showWeeklySettings"
-                            :label="$t('weeklyPrizes')"
-                            value="on"
-                            :model-value="weeklyPrizesActive"
-                            :checked="showWeeklySettings"
-                            @change="
-                                (event) => {
-                                    weeklyPrizesActive = event.target.checked;
-                                }
-                            "
-                        />
+                            <Checkbox
+                                id="weekly-prizes-active"
+                                name="showWeeklySettings"
+                                :label="$t('weeklyPrizes')"
+                                value="on"
+                                :model-value="weeklyPrizesActive"
+                                :checked="showWeeklySettings"
+                                @change="
+                                    (event) => {
+                                        weeklyPrizesActive = event.target.checked;
+                                    }
+                                "
+                            />
 
-                        <Checkbox
-                            id="monthly-prizes-active"
-                            name="showMonthlySettings"
-                            :label="$t('monthlyPrizes')"
-                            value="on"
-                            :model-value="monthlyPrizesActive"
-                            :checked="showMonthlySettings"
-                            @change="
-                                (event) => {
-                                    monthlyPrizesActive = event.target.checked;
-                                }
-                            "
-                        />
+                            <Checkbox
+                                id="monthly-prizes-active"
+                                name="showMonthlySettings"
+                                :label="$t('monthlyPrizes')"
+                                value="on"
+                                :model-value="monthlyPrizesActive"
+                                :checked="showMonthlySettings"
+                                @change="
+                                    (event) => {
+                                        monthlyPrizesActive = event.target.checked;
+                                    }
+                                "
+                            />
 
-                        <Checkbox
-                            id="main-prize-active"
-                            name="showMainPrizeSettings"
-                            :label="$t('mainPrize')"
-                            value="on"
-                            :model-value="mainPrizeActive"
-                            :checked="showMainPrizeSettings"
-                            @change="
-                                (event) => {
-                                    mainPrizeActive = event.target.checked;
-                                }
-                            "
-                        />
-                    </div>
+                            <Checkbox
+                                id="main-prize-active"
+                                name="showMainPrizeSettings"
+                                :label="$t('mainPrize')"
+                                value="on"
+                                :model-value="mainPrizeActive"
+                                :checked="showMainPrizeSettings"
+                                @change="
+                                    (event) => {
+                                        mainPrizeActive = event.target.checked;
+                                    }
+                                "
+                            />
+                        </div>
 
-                    <div v-if="dailyPrizesActive" class="mb-3">
-                        <h2 class="mb-3">{{ $t('dailyPrizes') }}</h2>
+                        <div v-if="dailyPrizesActive" class="mb-3">
+                            <h2 class="mb-3">{{ $t('dailyPrizes') }}</h2>
 
-                        <div v-for="prize in apiPrizes.dailyPrizes" :key="prize.id">
-                            <div class="row">
-                                <div class="col-6">
-                                    <Checkbox
-                                        :id="'daily-prize-' + prize.id"
-                                        :name="prize.name"
-                                        :label="prize.name"
-                                        value="on"
-                                        :checked="
-                                            apiPrizes.dailyPrizes[prize.name]
-                                                ? apiPrizes.dailyPrizes[prize.name].checked
-                                                : false
-                                        "
-                                    />
+                            <div v-for="prize in apiPrizes.dailyPrizes" :key="prize.id">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <Checkbox
+                                            :id="'daily-prize-' + prize.id"
+                                            :name="prize.name"
+                                            :label="prize.name"
+                                            value="on"
+                                            :checked="
+                                                apiPrizes.dailyPrizes[prize.name]
+                                                    ? apiPrizes.dailyPrizes[prize.name].checked
+                                                    : false
+                                            "
+                                        />
+                                    </div>
+
+                                    <div class="col-6">
+                                        <NumberInput
+                                            :id="'daily-prize-number-' + prize.id"
+                                            :name="'daily-' + prize.name + '-number'"
+                                            :label="$t('numberOfPrizes')"
+                                            :value="
+                                                apiPrizes.dailyPrizes[prize.name]
+                                                    ? apiPrizes.dailyPrizes[prize.name].number
+                                                    : 0
+                                            "
+                                        />
+                                    </div>
                                 </div>
+                            </div>
+                        </div>
 
-                                <div class="col-6">
-                                    <NumberInput
-                                        :id="'daily-prize-number-' + prize.id"
-                                        :name="'daily-' + prize.name + '-number'"
-                                        :label="$t('numberOfPrizes')"
-                                        :value="
-                                            apiPrizes.dailyPrizes[prize.name]
-                                                ? apiPrizes.dailyPrizes[prize.name].number
-                                                : 0
-                                        "
-                                    />
+                        <div v-if="weeklyPrizesActive" class="mb-3">
+                            <h2 class="mb-3">{{ $t('weeklyPrizes') }}</h2>
+
+                            <div v-for="prize in apiPrizes.weeklyPrizes" :key="prize.id">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <Checkbox
+                                            :id="'weekly-prize-' + prize.id"
+                                            :name="prize.name"
+                                            :label="prize.name"
+                                            :checked="
+                                                apiPrizes.weeklyPrizes[prize.name]
+                                                    ? apiPrizes.weeklyPrizes[prize.name].checked
+                                                    : false
+                                            "
+                                        />
+                                    </div>
+
+                                    <div class="col-6">
+                                        <NumberInput
+                                            :id="'weekly-prize-number-' + prize.id"
+                                            :name="'weekly-' + prize.name + '-number'"
+                                            :label="$t('numberOfPrizes')"
+                                            :value="
+                                                apiPrizes.weeklyPrizes[prize.name]
+                                                    ? apiPrizes.weeklyPrizes[prize.name].number
+                                                    : 0
+                                            "
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-if="monthlyPrizesActive" class="mb-3">
+                            <h2 class="mb-3">{{ $t('monthlyPrizes') }}</h2>
+
+                            <div v-for="prize in apiPrizes.monthlyPrizes" :key="prize.id">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <Checkbox
+                                            :id="'monthly-prize-' + prize.id"
+                                            :name="prize.name"
+                                            :label="prize.name"
+                                            :checked="
+                                                apiPrizes.monthlyPrizes[prize.name]
+                                                    ? apiPrizes.monthlyPrizes[prize.name].checked
+                                                    : false
+                                            "
+                                        />
+                                    </div>
+
+                                    <div class="col-6">
+                                        <NumberInput
+                                            :id="'monthly-prize-number-' + prize.id"
+                                            :name="'monthly-' + prize.name + '-number'"
+                                            :label="$t('numberOfPrizes')"
+                                            :value="
+                                                apiPrizes.monthlyPrizes[prize.name]
+                                                    ? apiPrizes.monthlyPrizes[prize.name].number
+                                                    : 0
+                                            "
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-if="mainPrizeActive" class="mb-3">
+                            <h2 class="mb-3">{{ $t('mainPrize') }}</h2>
+
+                            <div v-for="prize in apiPrizes.mainPrize" :key="prize.id">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <Checkbox
+                                            :id="'main-prize-' + prize.name"
+                                            :name="prize.name"
+                                            :label="prize.name"
+                                            :checked="
+                                                apiPrizes.mainPrize[prize.name]
+                                                    ? apiPrizes.mainPrize[prize.name].checked
+                                                    : false
+                                            "
+                                        />
+                                    </div>
+
+                                    <div class="col-6">
+                                        <NumberInput
+                                            :id="'main-prize-number-' + prize.name"
+                                            :name="'main-' + prize.name + '-number'"
+                                            :label="$t('numberOfPrizes')"
+                                            :value="
+                                                apiPrizes.mainPrize[prize.name]
+                                                    ? apiPrizes.mainPrize[prize.name].number
+                                                    : 0
+                                            "
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div v-if="weeklyPrizesActive" class="mb-3">
-                        <h2 class="mb-3">{{ $t('weeklyPrizes') }}</h2>
-
-                        <div v-for="prize in apiPrizes.weeklyPrizes" :key="prize.id">
-                            <div class="row">
-                                <div class="col-6">
-                                    <Checkbox
-                                        :id="'weekly-prize-' + prize.id"
-                                        :name="prize.name"
-                                        :label="prize.name"
-                                        :checked="
-                                            apiPrizes.weeklyPrizes[prize.name]
-                                                ? apiPrizes.weeklyPrizes[prize.name].checked
-                                                : false
-                                        "
-                                    />
-                                </div>
-
-                                <div class="col-6">
-                                    <NumberInput
-                                        :id="'weekly-prize-number-' + prize.id"
-                                        :name="'weekly-' + prize.name + '-number'"
-                                        :label="$t('numberOfPrizes')"
-                                        :value="
-                                            apiPrizes.weeklyPrizes[prize.name]
-                                                ? apiPrizes.weeklyPrizes[prize.name].number
-                                                : 0
-                                        "
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div v-if="monthlyPrizesActive" class="mb-3">
-                        <h2 class="mb-3">{{ $t('monthlyPrizes') }}</h2>
-
-                        <div v-for="prize in apiPrizes.monthlyPrizes" :key="prize.id">
-                            <div class="row">
-                                <div class="col-6">
-                                    <Checkbox
-                                        :id="'monthly-prize-' + prize.id"
-                                        :name="prize.name"
-                                        :label="prize.name"
-                                        :checked="
-                                            apiPrizes.monthlyPrizes[prize.name]
-                                                ? apiPrizes.monthlyPrizes[prize.name].checked
-                                                : false
-                                        "
-                                    />
-                                </div>
-
-                                <div class="col-6">
-                                    <NumberInput
-                                        :id="'monthly-prize-number-' + prize.id"
-                                        :name="'monthly-' + prize.name + '-number'"
-                                        :label="$t('numberOfPrizes')"
-                                        :value="
-                                            apiPrizes.monthlyPrizes[prize.name]
-                                                ? apiPrizes.monthlyPrizes[prize.name].number
-                                                : 0
-                                        "
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div v-if="mainPrizeActive" class="mb-3">
-                        <h2 class="mb-3">{{ $t('mainPrize') }}</h2>
-
-                        <div v-for="prize in apiPrizes.mainPrize" :key="prize.id">
-                            <div class="row">
-                                <div class="col-6">
-                                    <Checkbox
-                                        :id="'main-prize-' + prize.name"
-                                        :name="prize.name"
-                                        :label="prize.name"
-                                        :checked="
-                                            apiPrizes.mainPrize[prize.name]
-                                                ? apiPrizes.mainPrize[prize.name].checked
-                                                : false
-                                        "
-                                    />
-                                </div>
-
-                                <div class="col-6">
-                                    <NumberInput
-                                        :id="'main-prize-number-' + prize.name"
-                                        :name="'main-' + prize.name + '-number'"
-                                        :label="$t('numberOfPrizes')"
-                                        :value="
-                                            apiPrizes.mainPrize[prize.name] ? apiPrizes.mainPrize[prize.name].number : 0
-                                        "
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">{{ $t('submit') }}</button>
+                    <button type="submit" class="btn btn-primary" @click="test">{{ $t('submit') }}</button>
                 </form>
             </div>
         </div>
@@ -266,6 +290,11 @@
 </template>
 
 <script setup>
+    const features = useFeatureStore();
+    const client = useSanctumClient();
+    const runtimeConfig = useRuntimeConfig();
+    const { t } = useI18n();
+
     const dailyPrizesActive = ref(false);
     const monthlyPrizesActive = ref(false);
     const weeklyPrizesActive = ref(false);
@@ -375,23 +404,56 @@
     };
 
     const schema = object({
-        campaignName: string().min(1),
-        campaignDescription: string().min(1),
-        campaignStart: string().min(1),
-        campaignEnd: string().min(1),
-        drawType: union([literal('auto'), literal('human'), literal('external')]),
-        showDailySettings: string().optional(),
-        // TODO: Add prizes schema
+        campaign_name: string().min(1),
+        campaign_description: string().min(1),
+        campaign_start: date().transform((value) => {
+            return value.toISOString().split('T')[0];
+        }),
+        campaign_end: date().transform((value) => {
+            return value.toISOString().split('T')[0];
+        }),
+        entry_start: date().transform((value) => {
+            return value.toISOString().split('T')[0];
+        }),
+        entry_end: date().transform((value) => {
+            return value.toISOString().split('T')[0];
+        }),
+        drawing: union([literal('auto'), literal('manual'), literal('external')]),
     });
 
-    const { handleSubmit } = useForm({
+    const { handleSubmit, setErrors, resetForm } = useForm({
         validationSchema: toTypedSchema(schema),
     });
 
     const onSubmit = handleSubmit(async (values) => {
-        console.log(values);
-        // useEvent('showToast', { title: 'Success', message: 'Campaign created successfully' });
-        // await navigateTo('/campaign');
+        try {
+            await client(`${runtimeConfig.public.adminUrl}campaigns`, {
+                method: 'POST',
+                body: {
+                    data: JSON.stringify(values),
+                },
+            });
+
+            useEvent('showToast', { title: t('success'), message: t('campaignCreated') });
+            resetForm();
+            navigateTo('/campaign');
+        } catch (error) {
+            handleFormErrors(
+                error,
+                (errors) => {
+                    Object.keys(errors).forEach((key) => {
+                        setErrors({ [key]: errors[key] });
+                    });
+                },
+                (feedback) => {
+                    useEvent('showToast', {
+                        title: t(feedback.title),
+                        message: feedback.message,
+                        type: 'error',
+                    });
+                },
+            );
+        }
     });
 
     onMounted(() => {

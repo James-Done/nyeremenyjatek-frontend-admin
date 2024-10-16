@@ -27,6 +27,9 @@
 <script setup>
     definePageMeta({
         layout: 'unauthenticated',
+        sanctum: {
+            excluded: true,
+        },
     });
 
     const schema = object({

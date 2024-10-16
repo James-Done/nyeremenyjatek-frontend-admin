@@ -2,7 +2,9 @@
 export default defineNuxtConfig({
     runtimeConfig: {
         public: {
-            apiBase: process.env.NUXT_PUBLIC_API_BASE || '/api',
+            apiBase: process.env.NUXT_PUBLIC_API_BASE,
+            apiVersion: process.env.NUXT_PUBLIC_API_VERSION,
+            adminUrl: `${process.env.NUXT_PUBLIC_API_BASE}${process.env.NUXT_PUBLIC_API_VERSION}/admin/`,
         },
     },
 
@@ -26,7 +28,7 @@ export default defineNuxtConfig({
     compatibilityDate: '2024-04-03',
     devtools: { enabled: true },
     css: ['bootstrap/dist/css/bootstrap.min.css'],
-    modules: ['@nuxtjs/i18n'],
+    modules: ['@nuxtjs/i18n', 'nuxt-auth-sanctum', '@pinia/nuxt'],
 
     i18n: {
         vueI18n: './i18n.config.ts',
@@ -46,8 +48,46 @@ export default defineNuxtConfig({
             },
             {
                 from: 'zod',
-                imports: ['object', 'number', 'string', 'literal', 'union', 'boolean', 'url', 'extend', 'array'],
+                imports: [
+                    'object',
+                    'number',
+                    'string',
+                    'literal',
+                    'union',
+                    'boolean',
+                    'url',
+                    'extend',
+                    'array',
+                    'date',
+                    'optional',
+                ],
             },
         ],
+    },
+
+    routeRules: {
+        '/web/v1/**': {
+            proxy: { to: `${process.env.NUXT_PUBLIC_API_BASE_LOCAL}v1/**` },
+        },
+        '/web/**': {
+            proxy: { to: `${process.env.NUXT_PUBLIC_API_BASE_LOCAL}**` },
+        },
+    },
+
+    sanctum: {
+        mode: 'token',
+        baseUrl: `${process.env.NUXT_PUBLIC_API_BASE}`, // Laravel API
+        redirect: {
+            onLogin: '/',
+            onLogout: '/login',
+            onAuthOnly: '/login',
+            onGuestOnly: '/account',
+        },
+        endpoints: {
+            user: '/user',
+        },
+        globalMiddleware: {
+            enabled: true,
+        },
     },
 });

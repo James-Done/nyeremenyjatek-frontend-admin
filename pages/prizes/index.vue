@@ -36,6 +36,7 @@
 
 <script setup>
     const { t } = useI18n();
+
     const columns = ref([
         { key: 'image', label: t('image') },
         { key: 'name', label: t('name') },

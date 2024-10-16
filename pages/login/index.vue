@@ -32,18 +32,29 @@
         layout: 'unauthenticated',
     });
 
+    const { t } = useI18n();
+    const { login } = useSanctumAuth();
+
     const schema = object({
         email: string().email().min(1),
         password: string().min(1),
     });
 
-    const { handleSubmit, isSubmitting } = useForm({
+    const { handleSubmit, isSubmitting, setErrors } = useForm({
         validationSchema: toTypedSchema(schema),
     });
 
     const onSubmit = handleSubmit(async (values) => {
-        console.log(values);
+        const userCredentials = {
+            email: values.email,
+            password: values.password,
+        };
 
-        await navigateTo('/');
+        try {
+            await login(userCredentials);
+        } catch (error) {
+            console.error(error);
+            setErrors({ password: t('loginError'), email: t('loginError') });
+        }
     });
 </script>

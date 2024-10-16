@@ -17,11 +17,13 @@
     "dependencies": {
         "@nuxt/eslint": "^0.5.5",
         "@nuxtjs/i18n": "^8.5.2",
+        "@pinia/nuxt": "^0.5.5",
         "@vee-validate/zod": "^4.13.2",
         "@vuepic/vue-datepicker": "^9.0.3",
         "bootstrap": "5.3.3",
         "mitt": "^3.0.1",
         "nuxt": "^3.13.1",
+        "nuxt-auth-sanctum": "^0.5.0",
         "vue": "^3.5.0"
     },
     "devDependencies": {
