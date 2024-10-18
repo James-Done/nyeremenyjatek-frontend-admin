@@ -10,8 +10,6 @@
 
             <div class="row">
                 <form @submit="onSubmit">
-                    <input v-if="id" type="hidden" :value="id" />
-
                     <div class="mb-3">
                         <TextInput
                             id="campaign-name"
@@ -34,7 +32,7 @@
                     <div class="mb-3">
                         <DatePicker
                             id="campaign-start"
-                            :value="campaignStart"
+                            :value="entryStart"
                             name="entry_start"
                             :label="$t('entryStartDate')"
                             :required="true"
@@ -44,7 +42,7 @@
                     <div class="mb-3">
                         <DatePicker
                             id="campaign-start"
-                            :value="campaignStart"
+                            :value="entryEnd"
                             name="entry_end"
                             :label="$t('entryEndDate')"
                             :required="true"
@@ -77,11 +75,7 @@
                             name="drawing"
                             :label="$t('campaignDrawType')"
                             :value="drawType"
-                            :options="[
-                                { value: 'auto', label: $t('auto') },
-                                { value: 'manual', label: $t('manual') },
-                                { value: 'external', label: $t('external') },
-                            ]"
+                            :options="[{ value: 'manual', label: $t('manual') }]"
                         />
                     </div>
 
@@ -302,7 +296,7 @@
 
     const props = defineProps({
         id: {
-            type: String,
+            type: Number,
             default: undefined,
         },
         campaignName: {
@@ -310,6 +304,14 @@
             default: '',
         },
         campaignDescription: {
+            type: String,
+            default: '',
+        },
+        entryStart: {
+            type: String,
+            default: '',
+        },
+        entryEnd: {
             type: String,
             default: '',
         },
@@ -427,6 +429,20 @@
 
     const onSubmit = handleSubmit(async (values) => {
         try {
+            if (props.id) {
+                await client(`${runtimeConfig.public.adminUrl}campaigns/${props.id}`, {
+                    method: 'PUT',
+                    body: {
+                        data: {
+                            ...values,
+                        },
+                    },
+                });
+                useEvent('showToast', { title: t('success'), message: t('campaignUpdated') });
+                navigateTo('/campaign');
+                return;
+            }
+
             await client(`${runtimeConfig.public.adminUrl}campaigns`, {
                 method: 'POST',
                 body: {

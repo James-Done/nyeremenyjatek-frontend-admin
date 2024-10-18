@@ -46,6 +46,7 @@ export default createConfigForNuxt({})
                 handleFormErrors: 'readonly',
                 useSanctumUser: 'readonly',
                 document: 'readonly',
+                useRequestURL: 'readonly',
             },
         },
     });

@@ -9,7 +9,7 @@ export const useFeatureStore = defineStore('features', {
         },
         campaigns: {
             delete: false,
-            edit: false,
+            edit: true,
             prizes: false,
         },
         prizes: {
