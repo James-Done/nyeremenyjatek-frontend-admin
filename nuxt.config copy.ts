@@ -6,11 +6,11 @@ export default defineNuxtConfig({
             apiVersion: process.env.NUXT_PUBLIC_API_VERSION || '/v1',
             adminUrl: process.env.NUXT_PUBLIC_ADMIN_URL || 'https://api.nyeremenyjatek.donestudio.hu/api/v1/admin/'
         }*/
-            public: {
-                apiBase: process.env.NUXT_PUBLIC_API_BASE,
-                apiVersion: process.env.NUXT_PUBLIC_API_VERSION,
-                adminUrl: process.env.NUXT_PUBLIC_ADMIN_URL
-            }
+        public: {
+            apiBase: process.env.NUXT_PUBLIC_API_BASE,
+            apiVersion: process.env.NUXT_PUBLIC_API_VERSION,
+            adminUrl: process.env.NUXT_PUBLIC_ADMIN_URL
+        }
     },
 
     components: [

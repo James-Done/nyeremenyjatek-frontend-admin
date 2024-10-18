@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     runtimeConfig: {
-       /* public: {
+        /* public: {
             apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://api.nyeremenyjatek.donestudio.hu/api',
             apiVersion: process.env.NUXT_PUBLIC_API_VERSION || '/v1',
             adminUrl: process.env.NUXT_PUBLIC_ADMIN_URL || 'https://api.nyeremenyjatek.donestudio.hu/api/v1/admin/'
@@ -9,8 +9,27 @@ export default defineNuxtConfig({
         public: {
             apiBase: process.env.NUXT_PUBLIC_API_BASE,
             apiVersion: process.env.NUXT_PUBLIC_API_VERSION,
-            adminUrl: process.env.NUXT_PUBLIC_ADMIN_URL
-        }
+            adminUrl: process.env.NUXT_PUBLIC_ADMIN_URL,
+        },
+    },
+
+    $development: {
+        routeRules: {
+            '/web/v1/**': {
+                proxy: { to: `${process.env.NUXT_PUBLIC_API_BASE_LOCAL}v1/**` },
+            },
+            '/web/**': {
+                proxy: { to: `${process.env.NUXT_PUBLIC_API_BASE_LOCAL}**` },
+            },
+        },
+
+        runtimeConfig: {
+            public: {
+                apiBase: process.env.NUXT_PUBLIC_API_BASE,
+                apiVersion: process.env.NUXT_PUBLIC_API_VERSION,
+                adminUrl: process.env.NUXT_PUBLIC_ADMIN_URL,
+            },
+        },
     },
 
     components: [
@@ -69,16 +88,7 @@ export default defineNuxtConfig({
             },
         ],
     },
-/*
-    routeRules: {
-        '/web/v1/**': {
-            proxy: { to: `${process.env.NUXT_PUBLIC_API_BASE_LOCAL}v1/**` },
-        },
-        '/web/**': {
-            proxy: { to: `${process.env.NUXT_PUBLIC_API_BASE_LOCAL}**` },
-        },
-    },
-*/
+
     sanctum: {
         mode: 'token',
         //baseUrl: 'https://api.nyeremenyjatek.donestudio.hu/api', // Laravel API

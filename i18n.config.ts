@@ -132,6 +132,7 @@ export default defineI18nConfig(() => ({
             drawingDate: 'Drawing Date',
             winningDay: 'Winning Day',
             campaignUpdated: 'Campaign updated',
+            winnerDrawn: 'Winner drawn',
         },
         hu: {
             users: 'Felhasználók',
@@ -263,6 +264,7 @@ export default defineI18nConfig(() => ({
             drawingDate: 'Sorsolás dátuma',
             winningDay: 'Nyertes nap',
             campaignUpdated: 'Kampány frissítve',
+            winnerDrawn: 'Nyertes sorsolva',
         },
     },
 }));

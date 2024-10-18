@@ -6,13 +6,21 @@
                     <h1>{{ $t('drawWinner') }}</h1>
                 </div>
                 <div class="col-12">
-                    <form @submit="onSubmit">
+                    <label for="campaign" class="form-label">{{ $t('campaign') }}</label>
+                    <select id="campaign" v-model="entryStart" class="form-select">
+                        <option v-for="option in data" :key="option.campaign_id" :value="option.entry_start">
+                            {{ option.campaign_name }}
+                        </option>
+                    </select>
+
+                    <form v-if="entryStart" @submit="onSubmit">
                         <WeekPicker
                             id="drawing-year"
                             name="drawing_date"
                             :label="$t('drawingDate')"
                             :required="true"
                             :max-date="previousSunday"
+                            :min-date="new Date(entryStart)"
                         />
 
                         <button type="submit" :class="{ disabled: isSubmitting }" class="btn btn-primary">
@@ -29,6 +37,7 @@
     const { t } = useI18n();
     const runtimeConfig = useRuntimeConfig();
     const client = useSanctumClient();
+    const entryStart = ref(null);
 
     const schema = object({
         drawing_date: date().transform((value) => {
@@ -44,6 +53,15 @@
 
     const { handleSubmit, isSubmitting, setErrors } = useForm({
         validationSchema: toTypedSchema(schema),
+    });
+
+    const { data } = useAsyncData(async () => {
+        try {
+            const response = await client(`${runtimeConfig.public.adminUrl}campaigns`);
+            return response;
+        } catch (error) {
+            console.log(error);
+        }
     });
 
     const onSubmit = handleSubmit(async (values) => {

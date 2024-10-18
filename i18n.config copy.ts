@@ -131,6 +131,7 @@ export default defineI18nConfig(() => ({
             entryEndDate: 'Entry End Date',
             drawingDate: 'Drawing Date',
             winningDay: 'Winning Day',
+            campaignUpdated: 'Campaign updated',
         },
         hu: {
             users: 'Felhasználók',
@@ -261,6 +262,7 @@ export default defineI18nConfig(() => ({
             entryEndDate: 'Nevezés vége',
             drawingDate: 'Sorsolás dátuma',
             winningDay: 'Nyertes nap',
+            campaignUpdated: 'Kampány frissítve',
         },
     },
 }));

@@ -11,6 +11,7 @@
             :required="required"
             :enable-time-picker="false"
             :locale="locale"
+            :min-date="minDate"
             :max-date="maxDate"
             :week-picker="true"
             format="ww-yyyy"
@@ -51,6 +52,10 @@
             default: false,
         },
         maxDate: {
+            type: Date,
+            required: true,
+        },
+        minDate: {
             type: Date,
             required: true,
         },
