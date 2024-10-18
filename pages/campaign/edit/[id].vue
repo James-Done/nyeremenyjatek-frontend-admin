@@ -1,6 +1,7 @@
 <template>
     <div>
         <CampaignForm
+            v-if="status === 'success'"
             :id="data?.campaign_id"
             :campaign-name="data?.campaign_name"
             :campaign-description="data?.campaign_description"
@@ -20,7 +21,7 @@
     const url = useRequestURL();
     const { id } = route.params;
 
-    const { data } = useAsyncData('campaingDetails', async () => {
+    const { data, status } = useAsyncData('campaingDetails', async () => {
         try {
             const response = await client(`${config.public.adminUrl}campaigns/${id}`, {
                 headers: {
