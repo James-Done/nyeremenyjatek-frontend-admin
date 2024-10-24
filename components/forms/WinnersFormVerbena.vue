@@ -8,7 +8,7 @@
                 <div class="col-12">
                     <label for="campaign" class="form-label">{{ $t('campaign') }}</label>
                     <select id="campaign" v-model="entryStart" class="form-select">
-                        <option v-for="option in data" :key="option.campaign_id" :value="option.entry_start">
+                        <option v-for="option in data?.campaigns" :key="option.campaign_id" :value="option.entry_start">
                             {{ option.campaign_name }}
                         </option>
                     </select>
@@ -27,6 +27,28 @@
                             {{ $t('submit') }}
                         </button>
                     </form>
+                </div>
+
+                <div v-if="data?.drawings" class="col-12 mt-4">
+                    <h2>{{ $t('previousDrawings') }}</h2>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>{{ $t('week') }}</th>
+                                <th>{{ $t('year') }}</th>
+                                <th>{{ $t('campaign') }}</th>
+                                <th>{{ $t('drawingDate') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="drawing in data.drawings.drawings" :key="drawing.drawing_id">
+                                <td>{{ drawing.drawing_week }}</td>
+                                <td>{{ drawing.drawing_year }}</td>
+                                <td>{{ drawing.campaign_id }}</td>
+                                <td>{{ drawing.drawing_date }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -57,8 +79,15 @@
 
     const { data } = useAsyncData(async () => {
         try {
-            const response = await client(`${runtimeConfig.public.adminUrl}campaigns`);
-            return response;
+            const [campaigns, drawings] = await Promise.all([
+                client(`${runtimeConfig.public.adminUrl}campaigns`),
+                client(`${runtimeConfig.public.adminUrl}drawing`),
+            ]);
+
+            return {
+                campaigns: campaigns,
+                drawings: drawings,
+            };
         } catch (error) {
             console.log(error);
         }

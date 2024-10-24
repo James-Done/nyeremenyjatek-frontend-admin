@@ -44,7 +44,7 @@
     onMounted(() => {
         try {
             new $bs.Toast('#liveToast', {
-                delay: 1000,
+                delay: 5000,
             });
         } catch (e) {
             console.log('Bootstrap error: ', e);
